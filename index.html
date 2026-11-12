@@ -1,145 +1,165 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الحماية</title>
+    <title>System Error</title>
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            color: #0f0; /* لون أخضر هاكر */
-            font-family: 'Courier New', Courier, monospace;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
+            margin: 0; padding: 0; background-color: #000; color: #0f0;
+            font-family: 'Courier New', monospace; overflow: hidden;
+            display: flex; justify-content: center; align-items: center; height: 100vh;
         }
-
-        /* شاشة الهكر */
-        #hack-screen {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 9999;
-            background: black;
-            cursor: wait; /* شكل الماوس يتحول لساعة رملية */
-        }
-
-        .warning {
-            color: red;
-            font-size: 2rem;
-            font-weight: bold;
-            animation: blink 0.5s infinite;
-            margin-bottom: 20px;
-        }
-
-        .logs {
-            font-size: 1.2rem;
-            color: #0f0;
-            text-align: left;
-            width: 80%;
-            max-width: 500px;
-            height: 200px;
-            overflow: hidden;
-        }
-
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        /* شاشة البداية */
+        #start-screen { text-align: center; }
         #start-btn {
-            padding: 15px 30px;
-            font-size: 1.5rem;
-            background: #0f0;
-            color: black;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
+            padding: 15px 40px; font-size: 20px; background: #0f0; color: #000;
+            border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
+            box-shadow: 0 0 10px #0f0;
         }
+        #hack-screen {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column;
+            padding: 20px; box-sizing: border-box;
+        }
+        .warning-box {
+            color: #f00; font-size: 24px; font-weight: bold; text-align: center;
+            border: 2px solid #f00; padding: 10px; margin-bottom: 20px;
+            animation: blink 0.3s infinite; box-shadow: 0 0 20px #f00;
+        }
+        .terminal {
+            flex-grow: 1; overflow: hidden; font-size: 14px; line-height: 1.2;
+            display: flex; flex-direction: column; justify-content: flex-end;
+        }
+        .log-line { white-space: nowrap; }
+        .red { color: #f00; }
+        .yellow { color: #ff0; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <!-- شاشة البداية (مموهة) -->
+    <!-- شاشة البداية -->
     <div id="start-screen">
-        <h1>هل تريد فحص جهازك؟</h1>
-        <button id="start-btn" onclick="startPrank()">اضغط هنا</button>
+        <h1 style="color: white; font-family: sans-serif;">تحديث أمني مطلوب</h1>
+        <button id="start-btn" onclick="startPrank()">اضغط للبدء</button>
     </div>
 
-    <!-- شاشة الاختراق (التي ستظهر) -->
+    <!-- شاشة الاختراق -->
     <div id="hack-screen">
-        <div class="warning">⚠️ تم اختراق جهازك ⚠️</div>
-        <div class="logs" id="logs">
-            جاري استخراج البيانات...<br>
-            جاري سحب الصور...<br>
-            جاري الوصول إلى الكاميرا...<br>
-            جاري سرقة كلمات المرور...<br>
-            تم الاتصال بالسيرفر الرئيسي...<br>
-            <span style="color:red">لا تحاول إغلاق الصفحة!</span>
-        </div>
+        <div class="warning-box">⚠️ WARNING: SYSTEM COMPROMISED ⚠️<br><span style="font-size:16px; color:white;">DO NOT CLOSE THIS WINDOW</span></div>
+        <div class="terminal" id="terminal"></div>
     </div>
 
     <script>
-        function startPrank() {
-            // إخفاء شاشة البداية
-            document.getElementById('start-screen').style.display = 'none';
-            
-            // إظهار شاشة الاختراق
-            document.getElementById('hack-screen').style.display = 'flex';
+        let prankActive = false;
+        const duration = 30000; // 30 ثانية
 
-            // تفعيل وضع ملء الشاشة (لمنع رؤية شريط العنوان)
-            let elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.webkitRequestFullscreen) { /* Safari */
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) { /* IE11 */
-                elem.msRequestFullscreen();
+        // منع الخروج وإظهار رسالة تحذير
+        window.addEventListener('beforeunload', function (e) {
+            if (prankActive) {
+                e.preventDefault();
+                e.returnValue = 'أنت على وشك إغلاق النظام! هل أنت متأكد؟';
+                return e.returnValue;
             }
+        });
 
-            // تشغيل صوت (اختياري - يمكنك إضافة رابط صوت مخيف هنا)
-            // let audio = new Audio('scary_sound.mp3');
-            // audio.play();
+        // منع النقر بزر الفأرة الأيمن
+        document.addEventListener('contextmenu', e => e.preventDefault());
 
-            // إضافة نصوص تتزايد بشكل مرعب
-            let logs = document.getElementById('logs');
-            setInterval(() => {
-                logs.innerHTML += "جاري سحب ملف... <br>";
-                // جعل النص يتوقف عن الزيادة بعد فترة
-                if(logs.innerHTML.length > 1000) logs.innerHTML = logs.innerHTML.substring(0, 1000);
-            }, 300);
+        function playHackerSound() {
+            // إنشاء صوت "بييب" متكرر باستخدام Web Audio API (بدون ملفات خارجية)
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(150, audioCtx.currentTime); // تردد منخفض يسبب القلق
+                
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.start();
+                setInterval(() => {
+                    oscillator.frequency.setValueAtTime(Math.random() * 300 + 100, audioCtx.currentTime);
+                }, 200);
+            } catch (e) {
+                console.log("Audio not supported");
+            }
+        }
 
-            // إيقاف المقلب بعد 7 ثوانٍ (7000 مللي ثانية)
-            setTimeout(() => {
-                // الخروج من وضع ملء الشاشة
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
+        const fakeLogs = [
+            "root@system:~# sudo inject_payload --target=all",
+            "0x7FFA129384A: Access Granted",
+            "Bypassing firewall... [SUCCESS]",
+            "Downloading /etc/passwd...",
+            "WARNING: Kernel Panic in sector 7G",
+            "Uploading camera feed to 192.168.1.100...",
+            "Finding saved passwords in Chrome...",
+            "Decrypting AES-256...",
+            "0x00A1B2C3D4E5F6: Connection established",
+            "Accessing SMS database...",
+            "Deleting System32...",
+            "Injecting Ransomware... 99%",
+            "ERROR 404: Privacy Not Found",
+            "Connecting to dark web node...",
+            "root@system:~# whoami",
+            "> You are a victim."
+        ];
+
+        function startPrank() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('hack-screen').style.display = 'flex';
+            prankActive = true;
+
+            // تفعيل ملء الشاشة
+            let elem = document.documentElement;
+            if (elem.requestFullscreen) elem.requestFullscreen();
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+
+            playHackerSound();
+
+            const terminal = document.getElementById('terminal');
+            
+            // إنتاج نصوص عشوائية بسرعة
+            const logInterval = setInterval(() => {
+                const line = document.createElement('div');
+                line.className = 'log-line ' + (Math.random() > 0.8 ? 'red' : (Math.random() > 0.5 ? 'yellow' : ''));
+                
+                // خلط النصوص الجاهزة مع نصوص عشوائية
+                if (Math.random() > 0.3) {
+                    line.innerText = fakeLogs[Math.floor(Math.random() * fakeLogs.length)];
+                } else {
+                    // توليد كود سداسي عشري عشوائي يبدو مخيفاً
+                    let hex = '0x';
+                    for(let i=0; i<8; i++) hex += Math.floor(Math.random()*16).toString(16).toUpperCase();
+                    line.innerText = hex + " :: " + Math.random().toString(36).substring(2, 10).toUpperCase();
                 }
                 
-                // إظهار رسالة المزاح
+                terminal.appendChild(line);
+                if (terminal.childNodes.length > 20) terminal.removeChild(terminal.firstChild);
+            }, 50); // سرعة ظهور النصوص (كل 50 مللي ثانية)
+
+            // إنهاء المقلب بعد 30 ثانية
+            setTimeout(() => {
+                prankActive = false; // السماح بالخروج
+                clearInterval(logInterval);
+                
+                if (document.exitFullscreen) document.exitFullscreen();
+
                 document.body.innerHTML = `
-                    <div style="color: white; text-align: center; padding: 20px;">
-                        <h1 style="color: yellow; font-size: 3rem;">😂</h1>
-                        <h1 style="color: white;">معاك في المقلب!</h1>
-                        <p>لا تقلق، جهازك بأمان. هذه مجرد صفحة ويب تجريبية.</p>
-                        <p>لقد استغرقت ${7} ثوانٍ من الخوف!</p>
+                    <div style="text-align: center; font-family: sans-serif; color: white;">
+                        <h1 style="color: #0f0; font-size: 50px;">😂</h1>
+                        <h1 style="color: #f00; font-size: 30px;">معاك في المقلب يا صاحبي!</h1>
+                        <p style="font-size: 20px;">جهازك سليم 100%.. لا تخاف.</p>
+                        <p>لقد خسرت 30 ثانية من عمرك في الرعب!</p>
+                        <a href="https://tryhackme.com" target="_blank" style="color: #0f0; text-decoration: none;">تعلم الاختراق الحقيقي هنا</a>
                     </div>
                 `;
-            }, 7000); // هنا تحدد الوقت (7000 = 7 ثوانٍ)
+            }, duration);
         }
     </script>
 </body>
