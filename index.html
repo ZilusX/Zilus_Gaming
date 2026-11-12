@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Let's Play</title>
+    <title>هيا نلعب</title>
     <style>
         body {
-            margin: 0; padding: 0; background-color: #111; color: #0f0;
+            margin: 0; padding: 0; background-color: #000; color: #0f0;
             font-family: 'Courier New', monospace; overflow: hidden;
             width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center;
-            touch-action: none; /* منع التمرير */
-            background-image: radial-gradient(circle, #222 0%, #000 100%);
+            touch-action: none;
         }
-        /* تأثير الاهتزاز للشاشة */
         @keyframes shake {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             10% { transform: translate(-1px, -2px) rotate(-1deg); }
@@ -29,83 +27,77 @@
         .shaking { animation: shake 0.5s; animation-iteration-count: infinite; }
 
         #start-screen { text-align: center; padding: 20px; }
-        
-        /* تنسيق شاشة البداية لتبدو كلعبة */
-        .game-title {
-            color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 28px; margin-bottom: 10px; text-shadow: 0 0 10px #0f0;
-        }
-        .game-subtitle {
-            color: #888; font-size: 16px; margin-bottom: 40px; font-family: sans-serif;
-        }
-
+        .game-title { color: #fff; font-family: sans-serif; font-size: 28px; margin-bottom: 10px; text-shadow: 0 0 10px #0f0; }
+        .game-subtitle { color: #888; font-size: 16px; margin-bottom: 40px; font-family: sans-serif; }
         #start-btn {
             padding: 20px 60px; font-size: 22px; background: #0f0; color: #000;
             border: none; border-radius: 50px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 0 20px #0f0; transition: all 0.3s ease;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-shadow: 0 0 20px #0f0; font-family: sans-serif;
         }
         
-        #start-btn:hover {
-            background: #fff;
-            box-shadow: 0 0 40px #fff;
-            transform: scale(1.05);
-        }
-
-        /* شاشة الاختراق */
         #hack-screen {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: repeating-linear-gradient(0deg, rgba(255,0,0,0.1), rgba(255,0,0,0.1) 1px, transparent 1px, transparent 2px), #000;
             z-index: 9999; flex-direction: column; padding: 10px; box-sizing: border-box;
         }
-        
-        .warning-flash {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: red; opacity: 0.3; z-index: 10000; animation: flash 0.2s infinite; pointer-events: none;
-        }
+        .warning-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: red; opacity: 0.3; z-index: 10000; animation: flash 0.2s infinite; pointer-events: none; }
         @keyframes flash { 0% { opacity: 0; } 50% { opacity: 0.5; } 100% { opacity: 0; } }
-
-        .top-warning {
-            color: #fff; background: #f00; text-align: center; font-size: 20px; font-weight: bold;
-            padding: 10px; z-index: 10001; position: relative; margin-bottom: 10px; animation: blink 0.5s infinite;
-        }
+        
+        .top-warning { color: #fff; background: #f00; text-align: center; font-size: 20px; font-weight: bold; padding: 10px; z-index: 10001; position: relative; margin-bottom: 10px; animation: blink 0.5s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        .terminal {
-            flex-grow: 1; overflow: hidden; font-size: 13px; line-height: 1.1;
-            display: flex; flex-direction: column; justify-content: flex-end; z-index: 10001;
+        /* شريط تحميل وهمي مرعب */
+        .fake-download-bar {
+            width: 100%; background: #333; border: 1px solid #f00; height: 30px; 
+            margin-bottom: 10px; position: relative; z-index: 10001;
         }
+        .fake-download-progress {
+            width: 0%; height: 100%; background: #f00; text-align: center;
+            color: white; line-height: 30px; font-weight: bold; font-size: 14px;
+        }
+
+        .terminal { flex-grow: 1; overflow: hidden; font-size: 13px; line-height: 1.1; display: flex; flex-direction: column; justify-content: flex-end; z-index: 10001; }
         .log-line { white-space: nowrap; margin-bottom: 2px;}
         .red { color: #f00; } .yellow { color: #ff0; } .white { color: #fff; }
     </style>
 </head>
 <body>
 
-    <!-- شاشة البداية (اللعبة) -->
     <div id="start-screen">
         <div class="game-title">هيا نلعب لعبة... 🎮</div>
         <div class="game-subtitle">هل أنت شجاع بما يكفي لتجربتها؟</div>
         <button id="start-btn" onclick="startPrank()">أنا جاهز!</button>
     </div>
 
-    <!-- شاشة الاختراق -->
     <div id="hack-screen">
         <div class="warning-flash"></div>
-        <div class="top-warning">⚠️ تم تعطيل جهازك! لا تحاول الخروج ⚠️</div>
+        <div class="top-warning">⚠️ تم تعطيل جهازك! جاري سحب الملفات ⚠️</div>
+        
+        <!-- شريط التحميل الوهمي -->
+        <div class="fake-download-bar">
+            <div class="fake-download-progress" id="progressBar">0%</div>
+        </div>
+
         <div class="terminal" id="terminal"></div>
     </div>
 
     <script>
         let prankActive = false;
+        let logInterval, progressInterval;
         const duration = 30000; // 30 ثانية
 
-        // مصيدة الرجوع للخلف
+        // مصيدة الرجوع
         history.pushState(null, null, location.href);
-        window.onpopstate = function () {
-            if (prankActive) {
-                history.go(1);
-            }
-        };
+        window.onpopstate = function () { if (prankActive) history.go(1); };
+
+        // تغيير اسم التبويب ليرهب الضحية
+        let originalTitle = document.title;
+        let titleInterval;
+        function startTitleScare() {
+            titleInterval = setInterval(() => {
+                document.title = document.title === originalTitle ? "☠️ HACKED ☠️" : originalTitle;
+            }, 500);
+        }
 
         function playSiren() {
             try {
@@ -113,40 +105,29 @@
                 const ctx = new AudioContext();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
-                
                 osc.type = 'square'; 
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                
                 setInterval(() => {
                     osc.frequency.setValueAtTime(800, ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.5);
                 }, 500);
-                
                 osc.start();
-            } catch (e) {
-                console.log("Audio blocked");
-            }
+            } catch (e) { console.log("Audio blocked"); }
         }
 
         const fakeLogs = [
-            "root@system:~# sudo rm -rf /",
-            "0x7FFA1293... OVERFLOW DETECTED",
-            "Bypassing firewall... [SUCCESS]",
-            "Downloading /etc/shadow...",
-            "WARNING: Camera is ACTIVE",
-            "Uploading photos to remote server...",
-            "Finding saved passwords...",
-            "Decrypting AES-256...",
-            "Injecting Ransomware... 99%",
-            "ERROR 404: Privacy Not Found",
-            "> You are a victim."
+            "root@system:~# sudo rm -rf /", "0x7FFA1293... OVERFLOW DETECTED", "Bypassing firewall... [SUCCESS]",
+            "Downloading /etc/shadow...", "WARNING: Camera is ACTIVE", "Uploading photos to remote server...",
+            "Finding saved passwords...", "Decrypting AES-256...", "Injecting Ransomware... 99%",
+            "ERROR 404: Privacy Not Found", "> You are a victim.", "Uploading Contacts...", "Connecting to Dark Web..."
         ];
 
         function startPrank() {
             playSiren();
-
+            startTitleScare();
+            
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('hack-screen').style.display = 'flex';
             document.body.classList.add('shaking');
@@ -155,12 +136,24 @@
             let elem = document.documentElement;
             if (elem.requestFullscreen) { elem.requestFullscreen().catch(err=>{}); }
             
+            // تشغيل شريط التحميل الوهمي
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                if(progress < 100) {
+                    progress += Math.floor(Math.random() * 5) + 1; // زيادة عشوائية
+                    if(progress > 100) progress = 100;
+                    document.getElementById('progressBar').style.width = progress + '%';
+                    document.getElementById('progressBar').innerText = progress + '%';
+                } else {
+                    // إذا وصل 100%، اجعله يبدأ من جديد ليرهبه
+                    progress = 0; 
+                }
+            }, 500); // سرعة زيادة الشريط
+
             const terminal = document.getElementById('terminal');
-            
-            const logInterval = setInterval(() => {
+            logInterval = setInterval(() => {
                 const line = document.createElement('div');
                 line.className = 'log-line ' + (Math.random() > 0.7 ? 'red' : (Math.random() > 0.5 ? 'yellow' : 'white'));
-                
                 if (Math.random() > 0.3) {
                     line.innerText = fakeLogs[Math.floor(Math.random() * fakeLogs.length)];
                 } else {
@@ -168,28 +161,42 @@
                     for(let i=0; i<12; i++) hex += Math.floor(Math.random()*16).toString(16).toUpperCase();
                     line.innerText = hex + " :: " + Math.random().toString(36).substring(2, 15);
                 }
-                
                 terminal.appendChild(line);
                 if (terminal.childNodes.length > 25) terminal.removeChild(terminal.firstChild);
             }, 30);
 
-            setTimeout(() => {
-                prankActive = false;
-                clearInterval(logInterval);
-                document.body.classList.remove('shaking');
-                
-                if (document.exitFullscreen) document.exitFullscreen().catch(err=>{});
-
-                document.body.innerHTML = `
-                    <div style="text-align: center; font-family: sans-serif; padding: 20px;">
-                        <h1 style="color: #0f0; font-size: 60px;">😂</h1>
-                        <h1 style="color: #f00; font-size: 28px;">انتهت اللعبة! معاك في المقلب</h1>
-                        <p style="font-size: 18px; color: #fff;">جهازك سليم، بس المرة الجاية فكر قبل ما تضغط على أي رابط.</p>
-                        <button onclick="location.reload()" style="padding:10px 20px; margin-top:20px; font-size:16px; background:#0f0; border:none; border-radius:5px; font-weight:bold;">العب مرة أخرى</button>
-                    </div>
-                `;
-            }, duration);
+            setTimeout(endPrank, duration);
         }
+
+        function endPrank() {
+            if(!prankActive) return;
+            prankActive = false;
+            clearInterval(logInterval);
+            clearInterval(progressInterval);
+            clearInterval(titleInterval);
+            document.title = "معاك في المقلب 😂";
+            document.body.classList.remove('shaking');
+            if (document.exitFullscreen) document.exitFullscreen().catch(err=>{});
+
+            document.body.innerHTML = `
+                <div style="text-align: center; font-family: sans-serif; padding: 20px;">
+                    <h1 style="color: #0f0; font-size: 60px;">😂</h1>
+                    <h1 style="color: #f00; font-size: 28px;">انتهت اللعبة! معاك في المقلب</h1>
+                    <p style="font-size: 18px; color: #fff;">جهازك سليم، بس المرة الجاية متضغطش على أي رابط.</p>
+                    <button onclick="location.reload()" style="padding:10px 20px; margin-top:20px; font-size:16px; background:#0f0; border:none; border-radius:5px; font-weight:bold;">إعادة اللعب</button>
+                </div>
+            `;
+        }
+
+        // 🚀 مصيدة العودة للمتصفح
+        document.addEventListener("visibilitychange", function() {
+            if (prankActive && !document.hidden) {
+                let elem = document.documentElement;
+                if (elem.requestFullscreen) { elem.requestFullscreen().catch(err=>{}); }
+                // إعادة تشغيل الصوت إذا تم إيقافه
+                playSiren();
+            }
+        });
     </script>
 </body>
 </html>
