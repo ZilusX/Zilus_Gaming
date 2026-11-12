@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الحماية</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #0f0; /* لون أخضر هاكر */
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        /* شاشة الهكر */
+        #hack-screen {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            background: black;
+            cursor: wait; /* شكل الماوس يتحول لساعة رملية */
+        }
+
+        .warning {
+            color: red;
+            font-size: 2rem;
+            font-weight: bold;
+            animation: blink 0.5s infinite;
+            margin-bottom: 20px;
+        }
+
+        .logs {
+            font-size: 1.2rem;
+            color: #0f0;
+            text-align: left;
+            width: 80%;
+            max-width: 500px;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* شاشة البداية */
+        #start-btn {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            background: #0f0;
+            color: black;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة البداية (مموهة) -->
+    <div id="start-screen">
+        <h1>هل تريد فحص جهازك؟</h1>
+        <button id="start-btn" onclick="startPrank()">اضغط هنا</button>
+    </div>
+
+    <!-- شاشة الاختراق (التي ستظهر) -->
+    <div id="hack-screen">
+        <div class="warning">⚠️ تم اختراق جهازك ⚠️</div>
+        <div class="logs" id="logs">
+            جاري استخراج البيانات...<br>
+            جاري سحب الصور...<br>
+            جاري الوصول إلى الكاميرا...<br>
+            جاري سرقة كلمات المرور...<br>
+            تم الاتصال بالسيرفر الرئيسي...<br>
+            <span style="color:red">لا تحاول إغلاق الصفحة!</span>
+        </div>
+    </div>
+
+    <script>
+        function startPrank() {
+            // إخفاء شاشة البداية
+            document.getElementById('start-screen').style.display = 'none';
+            
+            // إظهار شاشة الاختراق
+            document.getElementById('hack-screen').style.display = 'flex';
+
+            // تفعيل وضع ملء الشاشة (لمنع رؤية شريط العنوان)
+            let elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+
+            // تشغيل صوت (اختياري - يمكنك إضافة رابط صوت مخيف هنا)
+            // let audio = new Audio('scary_sound.mp3');
+            // audio.play();
+
+            // إضافة نصوص تتزايد بشكل مرعب
+            let logs = document.getElementById('logs');
+            setInterval(() => {
+                logs.innerHTML += "جاري سحب ملف... <br>";
+                // جعل النص يتوقف عن الزيادة بعد فترة
+                if(logs.innerHTML.length > 1000) logs.innerHTML = logs.innerHTML.substring(0, 1000);
+            }, 300);
+
+            // إيقاف المقلب بعد 7 ثوانٍ (7000 مللي ثانية)
+            setTimeout(() => {
+                // الخروج من وضع ملء الشاشة
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+                
+                // إظهار رسالة المزاح
+                document.body.innerHTML = `
+                    <div style="color: white; text-align: center; padding: 20px;">
+                        <h1 style="color: yellow; font-size: 3rem;">😂</h1>
+                        <h1 style="color: white;">معاك في المقلب!</h1>
+                        <p>لا تقلق، جهازك بأمان. هذه مجرد صفحة ويب تجريبية.</p>
+                        <p>لقد استغرقت ${7} ثوانٍ من الخوف!</p>
+                    </div>
+                `;
+            }, 7000); // هنا تحدد الوقت (7000 = 7 ثوانٍ)
+        }
+    </script>
+</body>
+</html>
